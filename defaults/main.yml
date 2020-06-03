@@ -1,0 +1,10 @@
+---
+
+mysql_root_user: "root"
+mysql_root_password: "pass"
+mysql_port: "3306"
+mysql_host: "localhost"
+mysql_login_host: "%"
+
+mysql_databases: []
+mysql_users: []

@@ -1,0 +1,28 @@
+---
+- name: "Get the major version of python used to run ansible"
+  command: "{{ ansible_python_interpreter | default('/usr/bin/python') }} -c 'import sys; print(sys.version_info.major)'"
+  register: ansible_python_major
+  changed_when: false
+
+- debug:
+    msg: "ansible_python_interpreter major version: {{ ansible_python_major.stdout }}"
+
+- name: "Install package dependencies for ansible MySQL modules (python 2)"
+  apt:
+    name: "python-mysqldb"
+  when:
+    - ansible_python_major.stdout == "2"
+
+- name: "Install package dependencies for ansible MySQL modules (python 3)"
+  apt:
+    name: "python3-mysqldb"
+  when:
+    - ansible_python_major.stdout == "3"
+
+- name: "[fsulib] install mysql-client"
+  apt:
+    name: 
+      - "mysql-client"
+    state: "present"
+
+

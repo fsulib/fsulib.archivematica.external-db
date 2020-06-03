@@ -1,0 +1,11 @@
+---
+
+- name: "Make sure the MySQL databases are present"
+  mysql_db:
+    name: "{{ item.name }}"
+    collation: "{{ item.collation | default('utf8_general_ci') }}"
+    encoding: "{{ item.encoding | default('utf8') }}"
+    state: "present"
+    login_host: "{{ item.login_host }}"
+  with_items: "{{ mysql_databases }}"
+

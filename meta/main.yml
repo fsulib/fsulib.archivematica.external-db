@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: "Malcolm Shackelford"
+  company: "Florida State University Libraries"
+  license: BSD
+  min_ansible_version: 2.5
+  max_ansible_version: 2.8
+  platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+        - saucy
+        - precise
+        - bionic
+    - name: Debian
+      versions:
+        - wheezy
+        - squeeze
+  categories:
+    - database
+dependencies: []

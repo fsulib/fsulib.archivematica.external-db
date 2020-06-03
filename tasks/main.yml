@@ -1,0 +1,16 @@
+---
+# tasks file for fsulib.archivematica.external-db
+
+- include: dependencies.yml
+  tags: dependencies
+  
+- include: rootmycnf.yml
+  tags: rootmycnf
+
+- include: databases.yml
+  tags: databases
+
+- include: users.yml
+  tags: users
+
+
