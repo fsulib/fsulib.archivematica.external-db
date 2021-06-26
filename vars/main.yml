@@ -1,4 +1,2 @@
 ---
 
-mysql_root_user: "{{ mysql_root_user }}"
-mysql_root_password: "{{ mysql_root_password }}"
