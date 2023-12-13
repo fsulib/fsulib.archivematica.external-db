@@ -29,9 +29,13 @@
     name: 
       - "mysql-client"
     state: "present"
+  when:
+    - ansible_distribution == "Ubuntu"
 
 - name: "[fsulib][Alpine] install mysql-client"
   community.general.apk:
     name: 
       - "mysql-client"
     state: "present"
+  when:
+    - ansible_distribution == "Alpine"
