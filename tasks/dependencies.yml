@@ -7,21 +7,31 @@
 - debug:
     msg: "ansible_python_interpreter major version: {{ ansible_python_major.stdout }}"
 
-- name: "Install package dependencies for ansible MySQL modules (python 2)"
-  apt:
-    name: "python-mysqldb"
-  when:
-    - ansible_python_major.stdout == "2"
+- debug:
+    msg: "Linux distribution is {{ ansible_distribution }}"
 
-- name: "Install package dependencies for ansible MySQL modules (python 3)"
+- name: "[Ubuntu] Install package dependencies for ansible MySQL modules"
   apt:
     name: "python3-mysqldb"
   when:
     - ansible_python_major.stdout == "3"
+    - ansible_distribution == "Ubuntu"
 
-- name: "[fsulib] install mysql-client"
+- name: "[Alpine] Install package dependencies for ansible MySQL modules"
+  community.general.apk:
+    name: "py3-mysqlclient"
+  when:
+    - ansible_python_major.stdout == "3"
+    - ansible_distribution == "Alpine"
+
+- name: "[fsulib][Ubuntu] install mysql-client"
   apt:
     name: 
       - "mysql-client"
     state: "present"
 
+- name: "[fsulib][Alpine] install mysql-client"
+  community.general.apk:
+    name: 
+      - "mysql-client"
+    state: "present"
