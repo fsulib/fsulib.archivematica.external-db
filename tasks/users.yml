@@ -4,6 +4,7 @@
   mysql_user:
     name: "{{ item.name }}"
     password: "{{ item.pass | default('pass') }}"
+    append_privs: "{{ item.append_privs | default('false') }}"
     priv: "{{ item.priv | default('*.*:ALL') }}"
     state: "present"
     host: "{{ item.host | default('localhost') }}"
