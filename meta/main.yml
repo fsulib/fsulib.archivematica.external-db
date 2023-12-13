@@ -4,7 +4,7 @@ galaxy_info:
   company: "Florida State University Libraries"
   license: BSD
   min_ansible_version: 2.5
-  max_ansible_version: 2.8
+  max_ansible_version: 2.9
   platforms:
     - name: Ubuntu
       versions:
@@ -12,10 +12,9 @@ galaxy_info:
         - saucy
         - precise
         - bionic
-    - name: Debian
-      versions:
-        - wheezy
-        - squeeze
+    - name: Alpine
   categories:
     - database
-dependencies: []
+dependencies:
+  - src: https://github.com/ansible-collections/community.general
+    scm: git
