@@ -15,9 +15,3 @@ galaxy_info:
     - name: Alpine
   categories:
     - database
-  dependencies:
-    - src: https://github.com/ansible-collections/community.general
-      scm: git
-
-collections:
-  - community.general
