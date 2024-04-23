@@ -4,7 +4,7 @@ galaxy_info:
   company: "Florida State University Libraries"
   license: BSD
   min_ansible_version: 2.5
-  max_ansible_version: 2.9
+  max_ansible_version: 2.16
   platforms:
     - name: Ubuntu
       versions:
