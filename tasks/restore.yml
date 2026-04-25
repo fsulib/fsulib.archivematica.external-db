@@ -1,0 +1,67 @@
+---
+# Drops, recreates, and reloads each database that has an 's3_restore' block.
+# Runs only when mysql_restore_from_s3 is true.
+
+- name: "Ensure staging directory exists"
+  file:
+    path: "{{ mysql_s3_staging_dir }}"
+    state: directory
+    mode: "0700"
+
+- name: "Install AWS CLI (Ubuntu)"
+  apt:
+    name: awscli
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: "Install AWS CLI (Alpine)"
+  community.general.apk:
+    name: aws-cli
+    state: present
+  when: ansible_distribution == "Alpine"
+
+- name: "Drop database before restore"
+  mysql_db:
+    name: "{{ item.name }}"
+    state: absent
+    login_host: "{{ item.login_host }}"
+  loop: "{{ mysql_databases }}"
+  when: item.s3_restore is defined
+
+- name: "Recreate database after drop"
+  mysql_db:
+    name: "{{ item.name }}"
+    collation: "{{ item.collation | default('utf8_general_ci') }}"
+    encoding: "{{ item.encoding | default('utf8') }}"
+    state: present
+    login_host: "{{ item.login_host }}"
+  loop: "{{ mysql_databases }}"
+  when: item.s3_restore is defined
+
+- name: "Fetch SQL dump from S3"
+  amazon.aws.aws_s3:
+    bucket: "{{ item.s3_restore.bucket }}"
+    object: "{{ item.s3_restore.key }}"
+    dest: "{{ mysql_s3_staging_dir }}/{{ item.name }}.sql"
+    mode: get
+    aws_access_key: "{{ mysql_s3_aws_access_key | default(omit) }}"
+    aws_secret_key: "{{ mysql_s3_aws_secret_key | default(omit) }}"
+    region: "{{ mysql_s3_aws_region }}"
+  loop: "{{ mysql_databases }}"
+  when: item.s3_restore is defined
+
+- name: "Load SQL dump into database"
+  mysql_db:
+    name: "{{ item.name }}"
+    state: import
+    target: "{{ mysql_s3_staging_dir }}/{{ item.name }}.sql"
+    login_host: "{{ item.login_host }}"
+  loop: "{{ mysql_databases }}"
+  when: item.s3_restore is defined
+
+- name: "Remove staged dump files"
+  file:
+    path: "{{ mysql_s3_staging_dir }}/{{ item.name }}.sql"
+    state: absent
+  loop: "{{ mysql_databases }}"
+  when: item.s3_restore is defined
