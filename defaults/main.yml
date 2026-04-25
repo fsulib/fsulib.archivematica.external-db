@@ -8,3 +8,28 @@ mysql_login_host: "%"
 
 mysql_databases: []
 mysql_users: []
+
+# Set to true to drop, recreate, and reload databases from S3 dumps.
+# Each entry in mysql_databases may include an 's3_restore' block (see below).
+# When this flag is false the restore tasks are skipped entirely.
+mysql_restore_from_s3: false
+
+# AWS credentials used when fetching dumps from S3.
+# Leave empty to rely on an instance profile / environment variables instead.
+mysql_s3_aws_access_key: ""
+mysql_s3_aws_secret_key: ""
+mysql_s3_aws_region: "us-east-1"
+
+# Local directory on the target host where dump files are staged before import.
+mysql_s3_staging_dir: "/tmp/mysql_s3_restore"
+
+# Example mysql_databases entry with an s3_restore block:
+#
+# mysql_databases:
+#   - name: mydb
+#     collation: utf8_general_ci
+#     encoding: utf8
+#     login_host: localhost
+#     s3_restore:
+#       bucket: my-backup-bucket
+#       key: backups/mydb/latest.sql   # path inside the bucket
