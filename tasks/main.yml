@@ -10,5 +10,9 @@
 - import_tasks: databases.yml
   tags: databases
 
+- import_tasks: restore.yml
+  tags: restore
+  when: mysql_restore_from_s3 | bool
+
 - import_tasks: users.yml
   tags: users
