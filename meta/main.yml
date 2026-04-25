@@ -4,12 +4,12 @@ galaxy_info:
   company: "Florida State University Libraries"
   license: BSD
   min_ansible_version: 2.5
-  max_ansible_version: 2.16
+  max_ansible_version: 2.20
   platforms:
     - name: Ubuntu
       versions:
-        - bionic
         - jammy
+        - noble
     - name: Alpine
   categories:
     - database
