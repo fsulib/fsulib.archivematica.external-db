@@ -10,19 +10,79 @@
   tags:
     - restore
 
-- name: "Install AWS CLI (Ubuntu)"
+- name: "Install unzip and curl (Ubuntu)"
   apt:
-    name: awscli
+    name:
+      - unzip
+      - curl
     state: present
   when: ansible_distribution == "Ubuntu"
   tags:
     - restore
 
-- name: "Install AWS CLI (Alpine)"
+- name: "Install unzip and curl (Alpine)"
   community.general.apk:
-    name: aws-cli
+    name:
+      - unzip
+      - curl
     state: present
   when: ansible_distribution == "Alpine"
+  tags:
+    - restore
+
+- name: "Check if AWS CLI v2 is already installed"
+  command: aws --version
+  register: aws_cli_check
+  failed_when: false
+  changed_when: false
+  tags:
+    - restore
+
+- name: "Download AWS CLI v2 installer (x86_64)"
+  get_url:
+    url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+    dest: "/tmp/awscliv2.zip"
+    mode: "0644"
+  when:
+    - aws_cli_check.rc != 0
+    - ansible_architecture == "x86_64"
+  tags:
+    - restore
+
+- name: "Download AWS CLI v2 installer (aarch64)"
+  get_url:
+    url: "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"
+    dest: "/tmp/awscliv2.zip"
+    mode: "0644"
+  when:
+    - aws_cli_check.rc != 0
+    - ansible_architecture == "aarch64"
+  tags:
+    - restore
+
+- name: "Extract AWS CLI v2 installer"
+  unarchive:
+    src: "/tmp/awscliv2.zip"
+    dest: "/tmp"
+    remote_src: true
+  when: aws_cli_check.rc != 0
+  tags:
+    - restore
+
+- name: "Install AWS CLI v2"
+  command: /tmp/aws/install
+  when: aws_cli_check.rc != 0
+  tags:
+    - restore
+
+- name: "Clean up AWS CLI installer files"
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/tmp/awscliv2.zip"
+    - "/tmp/aws"
+  when: aws_cli_check.rc != 0
   tags:
     - restore
 
