@@ -99,8 +99,8 @@
 - name: "Recreate database after drop"
   mysql_db:
     name: "{{ item.name }}"
-    collation: "{{ item.collation | default('utf8_general_ci') }}"
-    encoding: "{{ item.encoding | default('utf8') }}"
+    collation: "{{ item.collation | default('utf8mb4_0900_ai_ci') }}"
+    encoding: "{{ item.encoding | default('utf8mb4') }}"
     state: present
     login_host: "{{ item.login_host }}"
   loop: "{{ mysql_databases }}"
