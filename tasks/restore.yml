@@ -7,18 +7,24 @@
     path: "{{ mysql_s3_staging_dir }}"
     state: directory
     mode: "0700"
+  tags:
+    - restore
 
 - name: "Install AWS CLI (Ubuntu)"
   apt:
     name: awscli
     state: present
   when: ansible_distribution == "Ubuntu"
+  tags:
+    - restore
 
 - name: "Install AWS CLI (Alpine)"
   community.general.apk:
     name: aws-cli
     state: present
   when: ansible_distribution == "Alpine"
+  tags:
+    - restore
 
 - name: "Drop database before restore"
   mysql_db:
@@ -27,6 +33,8 @@
     login_host: "{{ item.login_host }}"
   loop: "{{ mysql_databases }}"
   when: item.s3_restore is defined
+  tags:
+    - restore
 
 - name: "Recreate database after drop"
   mysql_db:
@@ -37,6 +45,8 @@
     login_host: "{{ item.login_host }}"
   loop: "{{ mysql_databases }}"
   when: item.s3_restore is defined
+  tags:
+    - restore
 
 - name: "Fetch SQL dump from S3"
   amazon.aws.aws_s3:
@@ -49,6 +59,8 @@
     region: "{{ mysql_s3_aws_region }}"
   loop: "{{ mysql_databases }}"
   when: item.s3_restore is defined
+  tags:
+    - restore
 
 - name: "Load SQL dump into database"
   mysql_db:
@@ -58,6 +70,8 @@
     login_host: "{{ item.login_host }}"
   loop: "{{ mysql_databases }}"
   when: item.s3_restore is defined
+  tags:
+    - restore
 
 - name: "Remove staged dump files"
   file:
@@ -65,3 +79,5 @@
     state: absent
   loop: "{{ mysql_databases }}"
   when: item.s3_restore is defined
+  tags:
+    - restore

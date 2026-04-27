@@ -2,3 +2,9 @@
 
 mysql_root_user: "{{ fsulib_ext_db_root_user }}"
 mysql_root_password: "{{ fsulib_ext_db_root_password }}"
+
+mysql_restore_from_s3: "{{ fsulib_ext_db_restore_from_s3 | default(false) }}"
+mysql_s3_aws_access_key: "{{ fsulib_ext_db_s3_aws_access_key | default('') }}"
+mysql_s3_aws_secret_key: "{{ fsulib_ext_db_s3_aws_secret_key | default('') }}"
+mysql_s3_aws_region: "{{ fsulib_ext_db_s3_aws_region | default('us-east-1') }}"
+mysql_s3_staging_dir: "{{ fsulib_ext_db_s3_staging_dir | default('/tmp/mysql_s3_restore') }}"

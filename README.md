@@ -17,10 +17,17 @@ pip install boto3 botocore
 
 ### Connection
 
+This role uses the `fsulib_ext_db_*` variable naming convention. Set these in your playbook or inventory:
+
+| Variable | Required | Description |
+|---|---|---|
+| `fsulib_ext_db_root_user` | yes | MySQL root username |
+| `fsulib_ext_db_root_password` | yes | MySQL root password |
+
+The following variables have defaults and can be overridden:
+
 | Variable | Default | Description |
 |---|---|---|
-| `mysql_root_user` | `root` | MySQL root username |
-| `mysql_root_password` | `password` | MySQL root password |
 | `mysql_port` | `3306` | MySQL port |
 | `mysql_host` | `localhost` | MySQL host |
 | `mysql_login_host` | `%` | Host used in user grant statements |
@@ -60,13 +67,15 @@ Each entry in `mysql_users` supports the following keys:
 
 ### S3 Restore
 
+To enable the S3 restore feature, set these variables using the `fsulib_ext_db_*` naming convention:
+
 | Variable | Default | Description |
 |---|---|---|
-| `mysql_restore_from_s3` | `false` | Set to `true` to enable the drop/recreate/reload workflow |
-| `mysql_s3_aws_access_key` | `""` | AWS access key ID (omit to use an instance profile) |
-| `mysql_s3_aws_secret_key` | `""` | AWS secret access key (omit to use an instance profile) |
-| `mysql_s3_aws_region` | `us-east-1` | AWS region of the S3 bucket |
-| `mysql_s3_staging_dir` | `/tmp/mysql_s3_restore` | Temporary directory on the target host for downloaded dumps |
+| `fsulib_ext_db_restore_from_s3` | `false` | Set to `true` to enable the drop/recreate/reload workflow |
+| `fsulib_ext_db_s3_aws_access_key` | `""` | AWS access key ID (omit to use an instance profile) |
+| `fsulib_ext_db_s3_aws_secret_key` | `""` | AWS secret access key (omit to use an instance profile) |
+| `fsulib_ext_db_s3_aws_region` | `us-east-1` | AWS region of the S3 bucket |
+| `fsulib_ext_db_s3_staging_dir` | `/tmp/mysql_s3_restore` | Temporary directory on the target host for downloaded dumps |
 
 To include a database in a restore run, add an `s3_restore` block to its entry in `mysql_databases`:
 
@@ -75,7 +84,7 @@ To include a database in a restore run, add an `s3_restore` block to its entry i
 | `s3_restore.bucket` | yes | S3 bucket name |
 | `s3_restore.key` | yes | Path to the `.sql` dump file within the bucket |
 
-Databases without an `s3_restore` block are unaffected when `mysql_restore_from_s3` is `true`.
+Databases without an `s3_restore` block are unaffected when `fsulib_ext_db_restore_from_s3` is `true`.
 
 ## Dependencies
 
@@ -88,6 +97,9 @@ None.
 ```yaml
 - hosts: db_servers
   vars:
+    fsulib_ext_db_root_user: root
+    fsulib_ext_db_root_password: "supersecret"
+
     mysql_databases:
       - name: archivematica
         login_host: localhost
@@ -110,11 +122,13 @@ None.
 ```yaml
 - hosts: db_servers
   vars:
-    mysql_restore_from_s3: true
-    mysql_s3_aws_region: us-east-1
+    fsulib_ext_db_root_user: root
+    fsulib_ext_db_root_password: "supersecret"
+    fsulib_ext_db_restore_from_s3: true
+    fsulib_ext_db_s3_aws_region: us-east-1
     # Omit key/secret to use an EC2 instance profile instead
-    mysql_s3_aws_access_key: "AKIAIOSFODNN7EXAMPLE"
-    mysql_s3_aws_secret_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    fsulib_ext_db_s3_aws_access_key: "AKIAIOSFODNN7EXAMPLE"
+    fsulib_ext_db_s3_aws_secret_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 
     mysql_databases:
       - name: archivematica
@@ -146,12 +160,12 @@ None.
 | `dependencies` | Install system packages (`python3-mysqldb`, `mysql-client`) |
 | `rootmycnf` | Write `/root/.my.cnf` with root credentials |
 | `databases` | Create databases |
-| `restore` | Drop, recreate, and reload databases from S3 (skipped unless `mysql_restore_from_s3: true`) |
+| `restore` | Drop, recreate, and reload databases from S3 (skipped unless `fsulib_ext_db_restore_from_s3: true`) |
 | `users` | Create MySQL users |
 
 ## S3 Restore Workflow
 
-When `mysql_restore_from_s3: true`, the `restore` tasks execute the following steps for each database that has an `s3_restore` block:
+When `fsulib_ext_db_restore_from_s3: true`, the `restore` tasks execute the following steps for each database that has an `s3_restore` block:
 
 1. Drop the database
 2. Recreate it with the configured collation and encoding
